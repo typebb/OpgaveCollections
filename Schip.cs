@@ -11,6 +11,13 @@ namespace OpgaveCollections
         public double Tonnage { get; set; }
         public string Naam { get; set; }
 
+        public Schip(string naam, double tonnage, double breedte, double lengte)
+        {
+            Naam = naam;
+            Tonnage = tonnage;
+            Breedte = breedte;
+            Lengte = lengte;
+        }
         public override string ToString()
         {
             return $"Naam: {Naam} \n Tonnage: {Tonnage} \n Breedte: {Breedte} \n Lengte: {Lengte}";
