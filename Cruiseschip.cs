@@ -20,5 +20,13 @@ namespace OpgaveCollections
         {
             return $"Naam: {Naam} \n Tonnage: {Tonnage} \n Breedte: {Breedte} \n Lengte: {Lengte} \n Aantal Passagiers: {AantalPassagiers}";
         }
+        public void AddTraject(List<Haven> havenTraject)
+        {
+            for (int i = 0; i < havenTraject.Count; i++)
+            {
+                if (i == 0) traject.AddFirst(havenTraject[i]);
+                traject.AddLast(havenTraject[i]);
+            }
+        }
     }
 }

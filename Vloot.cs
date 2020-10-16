@@ -4,10 +4,41 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class Vloot
+    class Vloot : IComparable, IComparable<Vloot>
     {
         public string VlootNaam { get; set; }
         public List<Schip> schepenLijst = new List<Schip>();
+        public double TotaalTonnage { get; set; }
+        public Vloot(string vlootNaam)
+        {
+            VlootNaam = vlootNaam;
+        }
+        public int CompareTo(object ander)
+        {
+            if (!ReferenceEquals(ander, null))
+            {
+                if (ander is Vloot)
+                {
+                    Vloot ditVloot = this;
+                    Vloot anderVloot = ander as Vloot;
+                    int compareteTo = ditVloot.TotaalTonnage.CompareTo(anderVloot.TotaalTonnage);
+                    if (compareteTo == 0) compareteTo = ditVloot.VlootNaam.CompareTo(anderVloot.VlootNaam);
+                    return compareteTo;
+                }
+                else throw new ArgumentException($"Object must be of type {nameof(Vloot)}");
+            }
+            else return +1;
+        }
+        public int CompareTo(Vloot vloot)
+        {
+            if (!ReferenceEquals(vloot, null))
+            {
+                int compareteTo = TotaalTonnage.CompareTo(vloot.TotaalTonnage);
+                if (compareteTo == 0) compareteTo = VlootNaam.CompareTo(vloot.VlootNaam);
+                return compareteTo;
+            }
+            else return +1;
+        }
         public void VoegSchipToe(Schip schip)
         {
             Schip gevondenSchip = schepenLijst.Find(f => f == schip);
