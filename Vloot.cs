@@ -17,7 +17,7 @@ namespace OpgaveCollections
         public void VerwijderSchip(Schip schip)
         {
             Schip gevondenSchip = schepenLijst.Find(f => f == schip);
-            if (gevondenSchip != null) schepenLijst.Remove(schip);
+            if (gevondenSchip != null) schepenLijst.Remove(gevondenSchip);
             else throw new ArgumentException("Schip zit niet in de vloot.");
         }
         public Schip ZoekSchipOp(Schip schip)
@@ -26,7 +26,7 @@ namespace OpgaveCollections
             if (gevondenSchip != null) return gevondenSchip;
             else throw new ArgumentException("Schip niet gevonden in de vloot.");
         }
-        public string OverzichtSchepenInVloot(Schip schip)
+        public string OverzichtSchepenInVloot()
         {
             if (schepenLijst.Count == 0) throw new ArgumentException("Geen schepen in de vloot.");
             StringBuilder overzicht = new StringBuilder();
