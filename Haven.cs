@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class Haven
+    class Haven : IComparable, IComparable<Haven>
     {
         public string HavenNaam { get; set; }
         public Haven(string havenNaam)

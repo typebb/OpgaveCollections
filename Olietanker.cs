@@ -4,12 +4,9 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class Olietanker : Schip
+    class Olietanker : Tanker
     {
-        public double CargoWaarde { get; set; }
-        public double Volume { get; set; }
-        public string Lading { get; set; }
-        public Olietanker(string naam, double tonnage, double breedte, double lengte, string lading, double volume, double cargoWaarde) : base(naam, tonnage, breedte, lengte)
+        public Olietanker(string naam, double tonnage, double breedte, double lengte, string lading, double volume, double cargoWaarde) : base(naam, tonnage, breedte, lengte, lading, volume, cargoWaarde)
         {
             Naam = naam;
             Tonnage = tonnage;
@@ -18,10 +15,6 @@ namespace OpgaveCollections
             Lading = lading;
             Volume = volume;
             CargoWaarde = cargoWaarde;
-        }
-        public override string ToString()
-        {
-            return $"Naam: {Naam} \n Tonnage: {Tonnage} \n Breedte: {Breedte} \n Lengte: {Lengte} \n Lading: {Lading}, \n Volume: {Volume}, \n Cargo Waarde: {CargoWaarde}";
         }
     }
 }

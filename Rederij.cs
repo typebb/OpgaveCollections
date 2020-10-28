@@ -7,80 +7,60 @@ namespace OpgaveCollections
     class Rederij
     {
         public string RederijNaam { get; set; }
-        List<Vloot> vlotenLijst = new List<Vloot>();
-        List<Haven> havenLijst = new List<Haven>();
+        private Dictionary<string, Vloot> vlotenLijst = new Dictionary<string, Vloot>();
+        SortedSet<Haven> havenLijst = new SortedSet<Haven>();
         public Rederij(string rederijNaam)
         {
             RederijNaam = rederijNaam;
         }
         public void VoegVlootToe(Vloot vloot)
         {
-            Vloot gevondenVloot = vlotenLijst.Find(v => v == vloot);
-            if (gevondenVloot == null) vlotenLijst.Add(vloot);
-            else throw new ArgumentException("Vloot zit al in de Rederij.");
+            if (!vlotenLijst.ContainsKey(vloot.VlootNaam))
+                vlotenLijst.Add(vloot.VlootNaam, vloot);
         }
         public void VerwijderVloot(Vloot vloot)
         {
-            Vloot gevondenVloot = vlotenLijst.Find(v => v == vloot);
-            if (gevondenVloot != null) vlotenLijst.Remove(gevondenVloot);
-            else throw new ArgumentException("Vloot zit niet in de Rederij.");
+            if (vlotenLijst.ContainsKey(vloot.VlootNaam))
+                vlotenLijst.Remove(vloot.VlootNaam);
         }
         public Vloot ZoekVlootOp(Vloot vloot)
         {
-            Vloot gevondenVloot = vlotenLijst.Find(v => v.VlootNaam == vloot.VlootNaam);
-            if (gevondenVloot != null) return gevondenVloot;
-            else throw new ArgumentException("Vloot niet gevonden in de Rederij.");
+            if (vlotenLijst.ContainsKey(vloot.VlootNaam))
+                return vlotenLijst[vloot.VlootNaam];
+            return null;
         }
         public void VoegHavenToe(Haven haven)
         {
-            Haven gevondenHaven = havenLijst.Find(h => h == haven);
-            if (gevondenHaven == null) havenLijst.Add(haven);
-            else throw new ArgumentException("Haven zit al in de Rederij.");
+            if (!havenLijst.Contains(haven))
+                havenLijst.Add(haven);
         }
         public void VerwijderHaven(Haven haven)
         {
-            Haven gevondenHaven = havenLijst.Find(h => h == haven);
-            if (gevondenHaven != null) havenLijst.Remove(gevondenHaven);
-            else throw new ArgumentException("Haven zit niet in de Rederij.");
+            if (havenLijst.Contains(haven))
+                havenLijst.Remove(haven);
         }
         public string OverzichtHavensInRederij()
         {
-            if (havenLijst.Count == 0) throw new ArgumentException("Geen Havens in de Rederij.");
-            havenLijst.Sort();
-            StringBuilder overzicht = new StringBuilder();
-            foreach (Haven h in havenLijst) overzicht.Append(h.ToString());
-            string overzichtHavens = overzicht.ToString();
-            return overzichtHavens;
+            if (havenLijst.Count == 0) return null;
+            return string.Join(", \n", havenLijst);
         }
         public void WijzigSchipVanVloot(string schipnaam, string vlootNaam)
         {
-            Schip schip = null;
-            for (int i = 0; i < vlotenLijst.Count; i++)
+            Schip schip = ZoekSchip(schipnaam);
+            if (schip != null)
             {
-                Schip gevondenSchip = vlotenLijst[i].schepenLijst.Find(s => s.Naam == schipnaam);
-                if (gevondenSchip != null)
-                {
-                    Vloot gevondenVloot = vlotenLijst.Find(v => v.VlootNaam == vlootNaam);
-                    if (gevondenVloot == null) throw new ArgumentException("Vloot met deze naam bestaat niet.");
-                    gevondenVloot.schepenLijst.Add(gevondenSchip);
-                    schip = gevondenSchip;
-                    vlotenLijst[i].schepenLijst.Remove(gevondenSchip);
-                    i = vlotenLijst.Count;
-                }
+                vlotenLijst[schip.Vloot.VlootNaam].VerwijderSchip(schip);
+                vlotenLijst[vlootNaam].VoegSchipToe(schip);
             }
-            if (schip == null) throw new ArgumentException("Schip niet gevonden in de Rederij");
         }
         public double TotaleCargoWaarde()
         {
             double cargoWaarde = 0;
-            foreach (Vloot v in vlotenLijst)
+            foreach (Vloot v in vlotenLijst.Values)
             {
-                foreach (Schip s in v.schepenLijst)
+                foreach (Schip s in v.GetSchepenLijst())
                 {
-                    if (s is Containerschip) cargoWaarde += ((Containerschip)s).CargoWaarde;
-                    if (s is Gastanker) cargoWaarde += ((Gastanker)s).CargoWaarde;
-                    if (s is Olietanker) cargoWaarde += ((Olietanker)s).CargoWaarde;
-                    if (s is RoRoschip) cargoWaarde += ((RoRoschip)s).CargoWaarde;
+                    if (s is VrachtSchip) cargoWaarde += ((VrachtSchip)s).CargoWaarde;
                 }
             }
             return cargoWaarde;
@@ -88,67 +68,58 @@ namespace OpgaveCollections
         public int TotaalAantalPassagiers()
         {
             int aantalPassagiers = 0;
-            foreach (Vloot v in vlotenLijst)
+            foreach (Vloot v in vlotenLijst.Values)
             {
-                foreach (Schip s in v.schepenLijst)
-                {
-                    if (s is Cruiseschip) aantalPassagiers += ((Cruiseschip)s).AantalPassagiers;
-                    if (s is Veerboot) aantalPassagiers += ((Veerboot)s).AantalPassagiers;
-                }
+                aantalPassagiers += v.Passagiers();
             }
             return aantalPassagiers;
         }
-        public Vloot[] TonnagePerVloot()
+        public SortedDictionary<double, List<Vloot>> TonnagePerVloot()
         {
             TonnageComparer tonnageComparer = new TonnageComparer();
-            Vloot[] tonnagePerVloot = new Vloot[vlotenLijst.Count];
-            for (int i = 0; i < vlotenLijst.Count; i++)
+            SortedDictionary<double, List<Vloot>> tonnagePerVloot = new SortedDictionary<double, List<Vloot>>(tonnageComparer);
+            foreach (Vloot v in vlotenLijst.Values)
             {
-                double tonnage = 0;
-                foreach (Schip s in vlotenLijst[i].schepenLijst)
-                {
-                    tonnage += s.Tonnage;
-                }
-                Vloot vloot = new Vloot(vlotenLijst[i].VlootNaam) { TotaalTonnage = tonnage };
-                tonnagePerVloot[i] = vloot;
+                double tonnage = v.Tonnage();
+                if (tonnagePerVloot.ContainsKey(tonnage)) tonnagePerVloot[tonnage].Add(v);
+                else tonnagePerVloot.Add(tonnage, new List<Vloot> { v });
             }
-            Array.Sort(tonnagePerVloot, tonnageComparer);
             return tonnagePerVloot;
         }
         public double TotaalVolumeVanTankers()
         {
-            double volume = 0;
-            foreach (Vloot v in vlotenLijst)
+            double totaalVolume = 0;
+            foreach (Vloot v in vlotenLijst.Values)
             {
-                foreach (Schip s in v.schepenLijst)
-                {
-                    if (s is Gastanker) volume += ((Gastanker)s).Volume;
-                    if (s is Olietanker) volume += ((Olietanker)s).Volume;
-                }
+                totaalVolume += v.VolumeVanTankers();
             }
-            return volume;
+            return totaalVolume;
         }
         public int BeschikbareSleepboten()
         {
             int beschikbareSleepboten = 0;
-            foreach (Vloot v in vlotenLijst)
+            foreach (Vloot v in vlotenLijst.Values)
             {
-                foreach (Schip s in v.schepenLijst)
-                {
-                    if (s is Sleepboot) beschikbareSleepboten++;
-                }
+                beschikbareSleepboten += v.AantalSleepboten();
             }
             return beschikbareSleepboten;
         }
         public string InfoOverSchip(string naam)
         {
-            Schip schip = null;
-            foreach (Vloot v in vlotenLijst)
+            Schip s;
+            if ((s = ZoekSchip(naam)) != null)
+                return s.ToString();
+            return null;
+        }
+        public Schip ZoekSchip(string schipNaam)
+        {
+            foreach (Vloot v in vlotenLijst.Values)
             {
-                schip = v.schepenLijst.Find(s => s.Naam == naam);
-                if (schip != null) return schip.ToString();
+                Schip s;
+                if ((s = v.ZoekSchipOp(schipNaam)) != null)
+                    return s;
             }
-            throw new ArgumentException("Schip niet gevonden in de Rederij");
+            return null;
         }
     }
 }

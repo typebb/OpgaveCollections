@@ -5,9 +5,9 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class TonnageComparer : Comparer<Vloot>
+    class TonnageComparer : IComparer<double>
     {
-        public override int Compare(Vloot x, Vloot y)
+        public int Compare(double x, double y)
         {
             if (ReferenceEquals(x, null) && ReferenceEquals(y, null)) return 0;
             if (ReferenceEquals(x, null)) return 1;

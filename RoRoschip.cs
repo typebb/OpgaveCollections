@@ -4,12 +4,11 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class RoRoschip : Schip
+    class RoRoschip : VrachtSchip
     {
         public int AantalAutos { get; set; }
         public int AantalTrucks { get; set; }
-        public double CargoWaarde { get; set; }
-        public RoRoschip(string naam, double tonnage, double breedte, double lengte, double cargoWaarde, int aantalTrucks, int aantalAutos) : base(naam, tonnage, breedte, lengte)
+        public RoRoschip(string naam, double tonnage, double breedte, double lengte, double cargoWaarde, int aantalTrucks, int aantalAutos) : base(naam, tonnage, breedte, lengte, cargoWaarde)
         {
             Naam = naam;
             Tonnage = tonnage;

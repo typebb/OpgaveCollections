@@ -4,11 +4,10 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class Containerschip : Schip
+    class Containerschip : VrachtSchip
     {
         public int AantalContainers { get; set; }
-        public double CargoWaarde { get; set; }
-        public Containerschip(string naam, double tonnage, double breedte, double lengte, double cargoWaarde, int aantalContainers) : base(naam, tonnage, breedte, lengte)
+        public Containerschip(string naam, double tonnage, double breedte, double lengte, double cargoWaarde, int aantalContainers) : base(naam, tonnage, breedte, lengte, cargoWaarde)
         {
             Naam = naam;
             Tonnage = tonnage;

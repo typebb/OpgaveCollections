@@ -4,12 +4,13 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class Schip : IComparable, IComparable<Schip>
+    abstract class Schip : IComparable, IComparable<Schip>
     {
         public double Lengte { get; set; }
         public double Breedte { get; set; }
         public double Tonnage { get; set; }
         public string Naam { get; set; }
+        public Vloot Vloot { get; set; }
 
         public Schip(string naam, double tonnage, double breedte, double lengte)
         {

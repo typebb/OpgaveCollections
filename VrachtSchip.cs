@@ -4,16 +4,15 @@ using System.Text;
 
 namespace OpgaveCollections
 {
-    class Gastanker : Tanker
+    abstract class VrachtSchip : Schip
     {
-        public Gastanker(string naam, double tonnage, double breedte, double lengte, string lading, double volume, double cargoWaarde) : base(naam, tonnage, breedte, lengte, lading, volume, cargoWaarde)
+        public double CargoWaarde { get; set; }
+        public VrachtSchip(string naam, double tonnage, double breedte, double lengte, double cargoWaarde) : base(naam, tonnage, breedte, lengte)
         {
             Naam = naam;
             Tonnage = tonnage;
             Breedte = breedte;
             Lengte = lengte;
-            Lading = lading;
-            Volume = volume;
             CargoWaarde = cargoWaarde;
         }
     }

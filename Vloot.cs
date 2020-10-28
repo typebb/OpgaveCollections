@@ -7,11 +7,20 @@ namespace OpgaveCollections
     class Vloot : IComparable, IComparable<Vloot>
     {
         public string VlootNaam { get; set; }
-        public List<Schip> schepenLijst = new List<Schip>();
-        public double TotaalTonnage { get; set; }
+        private Dictionary<string, Schip> schepenLijst = new Dictionary<string, Schip>();
         public Vloot(string vlootNaam)
         {
             VlootNaam = vlootNaam;
+        }
+        public override int GetHashCode()
+        {
+            return VlootNaam.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj is Vloot)
+                return (this.VlootNaam == ((Vloot)obj).VlootNaam);
+            else return false;
         }
         public int CompareTo(object ander)
         {
@@ -21,8 +30,7 @@ namespace OpgaveCollections
                 {
                     Vloot ditVloot = this;
                     Vloot anderVloot = ander as Vloot;
-                    int compareteTo = ditVloot.TotaalTonnage.CompareTo(anderVloot.TotaalTonnage);
-                    if (compareteTo == 0) compareteTo = ditVloot.VlootNaam.CompareTo(anderVloot.VlootNaam);
+                    int compareteTo = ditVloot.VlootNaam.CompareTo(anderVloot.VlootNaam);
                     return compareteTo;
                 }
                 else throw new ArgumentException($"Object must be of type {nameof(Vloot)}");
@@ -33,37 +41,72 @@ namespace OpgaveCollections
         {
             if (!ReferenceEquals(vloot, null))
             {
-                int compareteTo = TotaalTonnage.CompareTo(vloot.TotaalTonnage);
-                if (compareteTo == 0) compareteTo = VlootNaam.CompareTo(vloot.VlootNaam);
+                int compareteTo = VlootNaam.CompareTo(vloot.VlootNaam);
                 return compareteTo;
             }
             else return +1;
         }
         public void VoegSchipToe(Schip schip)
         {
-            Schip gevondenSchip = schepenLijst.Find(f => f == schip);
-            if (gevondenSchip == null) schepenLijst.Add(schip);
-            else throw new ArgumentException("Schip zit al in de vloot.");
+            if (!schepenLijst.ContainsKey(schip.Naam))
+            {
+                schepenLijst.Add(schip.Naam, schip);
+                schip.Vloot = this;
+            }
         }
         public void VerwijderSchip(Schip schip)
         {
-            Schip gevondenSchip = schepenLijst.Find(f => f == schip);
-            if (gevondenSchip != null) schepenLijst.Remove(gevondenSchip);
-            else throw new ArgumentException("Schip zit niet in de vloot.");
+            if (schepenLijst.ContainsKey(schip.Naam))
+            {
+                schepenLijst.Remove(schip.Naam);
+                schip.Vloot = null;
+            }
         }
-        public Schip ZoekSchipOp(Schip schip)
+        public Schip ZoekSchipOp(string schipNaam)
         {
-            Schip gevondenSchip = schepenLijst.Find(f => f.Naam == schip.Naam);
-            if (gevondenSchip != null) return gevondenSchip;
-            else throw new ArgumentException("Schip niet gevonden in de vloot.");
+            if (schepenLijst.ContainsKey(schipNaam))
+            return schepenLijst[schipNaam];
+            return null;
         }
         public string OverzichtSchepenInVloot()
         {
-            if (schepenLijst.Count == 0) throw new ArgumentException("Geen schepen in de vloot.");
-            StringBuilder overzicht = new StringBuilder();
-            foreach (Schip s in schepenLijst) overzicht.Append(s.ToString());
-            string overzichtSchepen = overzicht.ToString();
-            return overzichtSchepen;
+            if (schepenLijst.Count == 0) return null;
+            return string.Join(", \n", schepenLijst);
+        }
+        public List<Schip> GetSchepenLijst()
+        {
+            List<Schip> schepen = new List<Schip>();
+            foreach (KeyValuePair<string, Schip> s in schepenLijst)
+                schepen.Add(s.Value);
+            return schepen;
+        }
+        public int Passagiers()
+        {
+            int passagiers = 0;
+            foreach (Schip s in schepenLijst.Values)
+                if (s is PassagierSchip) passagiers += ((PassagierSchip)s).AantalPassagiers;
+            return passagiers;
+        }
+        public double Tonnage()
+        {
+            double tonnage = 0;
+            foreach (Schip s in schepenLijst.Values)
+                tonnage += s.Tonnage;
+            return tonnage;
+        }
+        public double VolumeVanTankers()
+        {
+            double volume = 0;
+            foreach (Schip s in schepenLijst.Values)
+                if (s is Tanker) volume += ((Tanker)s).Volume;
+            return volume;
+        }
+        public int AantalSleepboten()
+        {
+            int sleepboten = 0;
+            foreach (Schip s in schepenLijst.Values)
+                if (s is Sleepboot) sleepboten++;
+            return sleepboten;
         }
     }
 }
