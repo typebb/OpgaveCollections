@@ -8,7 +8,7 @@ namespace OpgaveCollections
     {
         public string RederijNaam { get; set; }
         private Dictionary<string, Vloot> vlotenLijst = new Dictionary<string, Vloot>();
-        SortedSet<Haven> havenLijst = new SortedSet<Haven>();
+        private SortedSet<Haven> havenLijst = new SortedSet<Haven>();
         public Rederij(string rederijNaam)
         {
             RederijNaam = rederijNaam;
@@ -58,10 +58,7 @@ namespace OpgaveCollections
             double cargoWaarde = 0;
             foreach (Vloot v in vlotenLijst.Values)
             {
-                foreach (Schip s in v.GetSchepenLijst())
-                {
-                    if (s is VrachtSchip) cargoWaarde += ((VrachtSchip)s).CargoWaarde;
-                }
+                cargoWaarde += v.CargoWaarde();
             }
             return cargoWaarde;
         }

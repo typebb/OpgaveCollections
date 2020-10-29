@@ -108,5 +108,12 @@ namespace OpgaveCollections
                 if (s is Sleepboot) sleepboten++;
             return sleepboten;
         }
+        public double CargoWaarde()
+        {
+            double cargoWaarde = 0;
+            foreach (Schip s in schepenLijst.Values)
+                if (s is VrachtSchip) cargoWaarde += ((VrachtSchip)s).CargoWaarde;
+            return cargoWaarde;
+        }
     }
 }
